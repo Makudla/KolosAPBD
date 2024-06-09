@@ -12,9 +12,7 @@ public class PaymentService(IPaymentRepository paymentRepository, IClientReposit
         if (client == null)
             throw new Exception("Nie znaleziono klienta");
 
-        var subscription = client.Sales
-                         .Select(s => s.IdSubscriptionNav)
-                         .FirstOrDefault(s => s.IdSubscription == idSubscription);
+        var subscription = GetClientSubscription(client, idSubscription);
         if (subscription == null)
             throw new Exception("Nie znaleziono subskrypcji");
 
@@ -33,5 +31,14 @@ public class PaymentService(IPaymentRepository paymentRepository, IClientReposit
 
         var paymentId = await paymentRepository.AddPaymentAsync(payment);
         return paymentId;
+    }
+
+    private Subscription GetClientSubscription(Client client, int idSubscription)
+    {
+        var subscription = client.Sales
+            .Select(sale => sale.IdSubscriptionNav)
+            .FirstOrDefault(s => s.IdSubscription == idSubscription);
+
+        return subscription;
     }
 }
